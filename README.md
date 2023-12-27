@@ -1,4 +1,4 @@
-# Scripts for quickly merging and modifying .csv/.tsv files.
+## Scripts for quickly merging and modifying .csv/.tsv files.
 
 `merge_tsv.py` reads from three input .tsv files containing at, gt and radar data. It reformats the data and outputs a single file containing complete data of the input files, organized row-by-row, leaving entries that do not exist blank.
 - Input: any three at.tsv, gt.tsv and radar.tsv files to merge.

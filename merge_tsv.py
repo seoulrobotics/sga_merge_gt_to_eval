@@ -4,9 +4,13 @@ from datetime import datetime
 def hasLine(lines, count):
     return count < len(lines)
 
-at_f = open("result_with_offset_lane2.tsv", "r")
-gt_f = open("gt_lane2.tsv", "r")
-radar_f = open("radar_lane2.tsv", "r")
+at_f = open("result_with_offset.tsv", "r")
+gt_f = open("gt.tsv", "r")
+radar_f = open("radar.tsv", "r")
+
+# Skip header rows
+gt_f.readline()
+radar_f.readline()
 
 at = at_f.readlines()
 gt = gt_f.readlines()
@@ -14,81 +18,72 @@ ra = radar_f.readlines()
 
 c_at, c_gt, c_ra = 0, 0, 0
 
-out_f = open("lane2_2712.tsv", "a")
+out_f = open("res.tsv", "a")
 out_f.write("date\ttime\tlane\tspeed\tlength\t\tdate\ttime\t\tlane\tspeed\tclass\t\ttime\tlane\tspeed\n")
 
+at_hasLine = hasLine(at, c_at)
+gt_hasLine = hasLine(gt, c_gt)
+ra_hasLine = hasLine(ra, c_ra)
+
 # i = 0
-while (hasLine(at, c_at) or hasLine(gt, c_gt) or hasLine(ra, c_ra)):
-    x = y = z = float('inf')
-
-    if hasLine(at, c_at):
-        x = re.split(r'\t+', at[c_at])[1]
-        x = int(re.split('\.', x)[0])
-    
-    if hasLine(gt, c_gt):
-        y = re.split(r'\t+', gt[c_gt])[1]
-        y = int(y.replace(':', ''))
-
-    if hasLine(ra, c_ra):
-        z = re.split(r'\t+', ra[c_ra])[0]
-        z = re.split('T|\+', z)[1].replace(':', '')
-        z = int(re.split('\.', z)[0])
-
+while (at_hasLine or gt_hasLine or ra_hasLine):
     res = ''
-    minTime = min(x, y, z)
+    x_time = y_time = z_time = float('inf')
+
+    if at_hasLine:
+        x_cols = re.split(r'\t+', at[c_at])
+        x_time = int(re.split('\.', x_cols[1])[0])
+        x_lane = int(x_cols[2])
     
-    if hasLine(at, c_at) and x - minTime <= 1:
-        res += at[c_at].replace('\n', '\t\t')
+    if gt_hasLine:
+        y_cols = re.split(r'\t+', gt[c_gt])
+        y_time = int(y_cols[1].replace(':', ''))
+        y_lane = int(y_cols[3])
+
+    if ra_hasLine:
+        z_cols = re.split(r'\t+', ra[c_ra])
+        z_time = re.split('T|\+', z_cols[0])[1].replace(':', '')
+        z_time = int(re.split('\.', z_time)[0])
+        z_lane = int(z_cols[1])
+
+    minTime, minLane = min(
+        (x_time, x_lane),
+        (y_time, y_lane),
+        (z_time, z_lane)
+    )
+    
+    if (at_hasLine and
+        x_time - minTime <= 1 and
+        x_lane == minLane):
+        res += at[c_at].replace('\n', '')
         c_at += 1
     else:
         res += '\t' * 6
     
-    if hasLine(gt, c_gt) and y - minTime <= 1:
+    if (gt_hasLine and
+        y_time - minTime <= 1 and
+        y_lane == minLane):
         res += gt[c_gt].replace('\n', '\t\t')
         c_gt += 1
     else:
         res += '\t' * 7
     
-    if hasLine(ra, c_ra) and z - minTime <= 1:
+    if (ra_hasLine and
+        z_time - minTime <= 1 and
+        z_lane == minLane):
         res += ra[c_ra]
         c_ra += 1
     else:
         res += '\n'
 
+    at_hasLine = hasLine(at, c_at)
+    gt_hasLine = hasLine(gt, c_gt)
+    ra_hasLine = hasLine(ra, c_ra)
+
+    # i += 1
     out_f.write(res)
 
 out_f.close()
 at_f.close()
 gt_f.close()
 radar_f.close()
-
-### Split files ###
-# at_1 = open("at_1.tsv", "a")
-# at_2 = open("at_2.tsv", "a")
-# for line in at:
-#     if re.split(r'\t+', line)[2] == '1':
-#         at_1.write(line)
-#     else:
-#         at_2.write(line)
-# at_1.close()
-# at_2.close()
-
-# gt_1 = open("gt_1.tsv", "a")
-# gt_2 = open("gt_2.tsv", "a")
-# for line in gt:
-#     if re.split(r'\t+', line)[3] == '1':
-#         gt_1.write(line)
-#     else:
-#         gt_2.write(line)
-# gt_1.close()
-# gt_2.close()
-
-# radar_1 = open("radar_1.tsv", "a")
-# radar_2 = open("radar_2.tsv", "a")
-# for line in radar:
-#     if re.split(r'\t+', line)[1] == '1':
-#         radar_1.write(line)
-#     else:
-#         radar_2.write(line)
-# radar_1.close()
-# radar_2.close()
