@@ -4,3 +4,5 @@ align.py
 
 *.tsv
 *.csv
+
+'.~lock*'
