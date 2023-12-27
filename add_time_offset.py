@@ -1,10 +1,18 @@
 import re
+import sys
 import datetime
 
-f_in = open("output2.tsv", "r")
-f_out = open("new_output2.tsv", "a")
+filename, h, m, s, sign = sys.argv
 
-offset = datetime.timedelta(hours=2, minutes=19, seconds=14)
+f_in = open(filename, "r")
+f_out = open(f"result_with_offset.tsv", "a")
+
+offset = datetime.timedelta(hours=h, minutes=m, seconds=s)
+
+# Skip header line
+f_in.readline()
+
+sign = -1 if sign == '-' else 1
 
 for line in f_in:
     line = re.split('\t', line)
@@ -12,7 +20,7 @@ for line in f_in:
         time = datetime.datetime.strptime(line[1],"%H%M%S.%f")
     else:
         time = datetime.datetime.strptime(line[1],"%H%M%S")
-    newTime = time + offset
+    newTime = time + (offset * sign)
     line[1] = newTime.strftime("%H%M%S.%f")[:10]
     line = '\t'.join(line)
     f_out.write(line)

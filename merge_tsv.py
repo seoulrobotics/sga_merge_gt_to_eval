@@ -2,11 +2,11 @@ import re
 from datetime import datetime
 
 def hasLine(lines, count):
-    return count < len(lines) - 1
+    return count < len(lines)
 
-at_f = open("at_1.tsv", "r")
-gt_f = open("gt_1.tsv", "r")
-radar_f = open("radar_1.tsv", "r")
+at_f = open("result_with_offset_lane2.tsv", "r")
+gt_f = open("gt_lane2.tsv", "r")
+radar_f = open("radar_lane2.tsv", "r")
 
 at = at_f.readlines()
 gt = gt_f.readlines()
@@ -14,24 +14,29 @@ ra = radar_f.readlines()
 
 c_at, c_gt, c_ra = 0, 0, 0
 
-out_f = open("lane1.tsv", "a")
+out_f = open("lane2_2712.tsv", "a")
 out_f.write("date\ttime\tlane\tspeed\tlength\t\tdate\ttime\t\tlane\tspeed\tclass\t\ttime\tlane\tspeed\n")
 
 # i = 0
 while (hasLine(at, c_at) or hasLine(gt, c_gt) or hasLine(ra, c_ra)):
-    # Get timestamps
-    x = re.split(r'\t+', at[c_at])[1]
-    y = re.split(r'\t+', gt[c_gt])[1]
-    z = re.split(r'\t+', ra[c_ra])[0]
+    x = y = z = float('inf')
 
-    # Format timestamps
-    x = int(re.split('\.', x)[0])
-    y = int(y.replace(':', ''))
-    z = re.split('T|\+', z)[1].replace(':', '')
-    z = int(re.split('\.', z)[0])
+    if hasLine(at, c_at):
+        x = re.split(r'\t+', at[c_at])[1]
+        x = int(re.split('\.', x)[0])
+    
+    if hasLine(gt, c_gt):
+        y = re.split(r'\t+', gt[c_gt])[1]
+        y = int(y.replace(':', ''))
+
+    if hasLine(ra, c_ra):
+        z = re.split(r'\t+', ra[c_ra])[0]
+        z = re.split('T|\+', z)[1].replace(':', '')
+        z = int(re.split('\.', z)[0])
 
     res = ''
     minTime = min(x, y, z)
+    
     if hasLine(at, c_at) and x - minTime <= 1:
         res += at[c_at].replace('\n', '\t\t')
         c_at += 1

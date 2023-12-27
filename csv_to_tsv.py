@@ -1,5 +1,5 @@
-in_f = open("output2.csv", "r")
-out_f = open("output2.tsv", "a")
+in_f = open("result_with_offset_lane2.csv", "r")
+out_f = open("result_with_offset_lane2.tsv", "a")
 
 for line in in_f:
     out_f.write(line.replace(',', '\t'))
