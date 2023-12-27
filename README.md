@@ -8,9 +8,9 @@
 - Input: any .csv or .tsv file with a column named 'time' (case insensitive) containing DateTime formatted timestamps.
 - Output: a .tsv file with modified timestamps.
 - Flags:
-    - `-h` to set the number of hours to modify.
-    - `-m` to set the number of minutes to modify.
-    - `-s` to set the number of seconds to modify.
+    - `-h <int>` to set the number of hours to modify.
+    - `-m <int>` to set the number of minutes to modify.
+    - `-s <int>` to set the number of seconds to modify.
     - `--sub` to subtract instead of add.
 
 The `utils` folder contains optional utility functions.
