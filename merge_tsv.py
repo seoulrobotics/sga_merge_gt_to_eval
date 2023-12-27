@@ -7,9 +7,9 @@ def hasLine(lines, count):
 
 parser = argparse.ArgumentParser(description='Script for merging .tsv files.')
 
-parser.add_argument('filename1', required=True)
-parser.add_argument('filename2', required=True)
-parser.add_argument('filename3', required=True)
+parser.add_argument('filename1')
+parser.add_argument('filename2')
+parser.add_argument('filename3')
 
 args = parser.parse_args()
 
