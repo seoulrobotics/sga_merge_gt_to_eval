@@ -26,14 +26,13 @@ ra = ra_f.readlines()
 
 c_at, c_gt, c_ra = 0, 0, 0
 
-out_f = open("merged.tsv", "a")
+out_f = open("merged2.tsv", "a")
 out_f.write("date\ttime\tlane\tspeed\tlength\t\tdate\ttime\t\tlane\tspeed\tclass\t\ttime\tlane\tspeed\n")
 
 at_hasLine = hasLine(at, c_at)
 gt_hasLine = hasLine(gt, c_gt)
 ra_hasLine = hasLine(ra, c_ra)
 
-# i = 0
 while (at_hasLine or gt_hasLine or ra_hasLine):
     res = ''
     x_time = y_time = z_time = float('inf')
@@ -42,7 +41,7 @@ while (at_hasLine or gt_hasLine or ra_hasLine):
         x_cols = re.split(r'\t+', at[c_at])
         x_time = int(re.split('\.', x_cols[1])[0])
         x_lane = int(x_cols[2])
-    
+
     if gt_hasLine:
         y_cols = re.split(r'\t+', gt[c_gt])
         y_time = int(y_cols[1].replace(':', ''))
@@ -63,7 +62,7 @@ while (at_hasLine or gt_hasLine or ra_hasLine):
     if (at_hasLine and
         x_time - minTime <= 1 and
         x_lane == minLane):
-        res += at[c_at].replace('\n', '')
+        res += at[c_at].strip() + '\t\t'
         c_at += 1
     else:
         res += '\t' * 6
@@ -71,7 +70,7 @@ while (at_hasLine or gt_hasLine or ra_hasLine):
     if (gt_hasLine and
         y_time - minTime <= 1 and
         y_lane == minLane):
-        res += gt[c_gt].replace('\n', '\t\t')
+        res += gt[c_gt].strip() + '\t\t'
         c_gt += 1
     else:
         res += '\t' * 7
@@ -79,7 +78,7 @@ while (at_hasLine or gt_hasLine or ra_hasLine):
     if (ra_hasLine and
         z_time - minTime <= 1 and
         z_lane == minLane):
-        res += ra[c_ra]
+        res += ra[c_ra].strip() + '\n'
         c_ra += 1
     else:
         res += '\n'
@@ -88,7 +87,6 @@ while (at_hasLine or gt_hasLine or ra_hasLine):
     gt_hasLine = hasLine(gt, c_gt)
     ra_hasLine = hasLine(ra, c_ra)
 
-    # i += 1
     out_f.write(res)
 
 out_f.close()
