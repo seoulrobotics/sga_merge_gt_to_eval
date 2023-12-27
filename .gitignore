@@ -1,3 +1,6 @@
+__pycache__/
+
+align.py
+
 *.tsv
 *.csv
-align.py
