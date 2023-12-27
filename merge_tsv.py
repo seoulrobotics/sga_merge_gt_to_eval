@@ -1,24 +1,33 @@
+import argparse
 import re
 from datetime import datetime
 
 def hasLine(lines, count):
     return count < len(lines)
 
-at_f = open("result_with_offset.tsv", "r")
-gt_f = open("gt.tsv", "r")
-radar_f = open("radar.tsv", "r")
+parser = argparse.ArgumentParser(description='Script for merging .tsv files.')
+
+parser.add_argument('filename1', required=True)
+parser.add_argument('filename2', required=True)
+parser.add_argument('filename3', required=True)
+
+args = parser.parse_args()
+
+at_f = open(f'{args.filename1}', "r")
+gt_f = open(f'{args.filename2}', "r")
+ra_f = open(f'{args.filename3}', "r")
 
 # Skip header rows
 gt_f.readline()
-radar_f.readline()
+ra_f.readline()
 
 at = at_f.readlines()
 gt = gt_f.readlines()
-ra = radar_f.readlines()
+ra = ra_f.readlines()
 
 c_at, c_gt, c_ra = 0, 0, 0
 
-out_f = open("res.tsv", "a")
+out_f = open("merged.tsv", "a")
 out_f.write("date\ttime\tlane\tspeed\tlength\t\tdate\ttime\t\tlane\tspeed\tclass\t\ttime\tlane\tspeed\n")
 
 at_hasLine = hasLine(at, c_at)
@@ -86,4 +95,4 @@ while (at_hasLine or gt_hasLine or ra_hasLine):
 out_f.close()
 at_f.close()
 gt_f.close()
-radar_f.close()
+ra_f.close()

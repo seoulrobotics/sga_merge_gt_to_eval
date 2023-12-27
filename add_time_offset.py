@@ -7,7 +7,7 @@ parser = argparse.ArgumentParser(description='Add DateTime offset to a file.')
 
 parser = argparse.ArgumentParser(add_help=False)
 
-parser.add_argument('filename')
+parser.add_argument('filename', required=True)
 parser.add_argument('-h', '--hours', type=int, nargs=1, default=[0])
 parser.add_argument('-m', '--minutes', type=int, nargs=1, default=[0])
 parser.add_argument('-s', '--seconds', type=int, nargs=1, default=[0])
