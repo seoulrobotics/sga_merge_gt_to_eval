@@ -1,10 +1,9 @@
 import re
+import os
 import argparse
 
 from datetime import datetime
 from datetime import timedelta
-
-from csv_to_tsv import csv_to_tsv
 
 def close_files_and_exit(f_in, f_out):
     f_in.close()
@@ -23,8 +22,10 @@ parser.add_argument('--sub', action='store_true')
 
 args = parser.parse_args()
 
+filename_without_extension = args.filename.split('.')[0]
 f_in = open(f'{args.filename}', "r")
-f_out = open(f'offset_{args.filename}', "a")
+
+f_out = open(f'output_files/{filename_without_extension}_offset.tsv', "a")
 
 offset = timedelta(hours=args.hours[0], minutes=args.minutes[0], seconds=args.seconds[0])
 
@@ -34,9 +35,10 @@ delimiter = ',' if '.csv' in args.filename else '\t'
 
 # Find column containing timestamps
 f_headers = f_in.readline()
-f_out.write(f_headers)
 
 f_headers = re.split(delimiter, f_headers)
+
+f_out.write('\t'.join(f_headers))
 
 col_with_timestamp = -1
 if not f_headers[0].isdigit():
@@ -61,7 +63,7 @@ for line in f_in.readlines():
     timestamp = datetime.strptime(timestamp, "%H%M%S")
     newTime = timestamp + (offset * sign)
     line[col_with_timestamp] = newTime.strftime("%H:%M:%S")
-    line = delimiter.join(line)
+    line = '\t'.join(line)
     f_out.write(line)
 
 close_files_and_exit(f_in, f_out)

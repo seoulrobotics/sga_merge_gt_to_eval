@@ -5,7 +5,6 @@ def csv_to_tsv(filename):
     new_file_name = f"{filename.replace('.csv', '.tsv')}"
     if os.path.isfile(new_file_name):
         print(f"{new_file_name} already exists.")
-        return
 
     in_f = open(f"{filename}", "r")
     out_f = open(f"{new_file_name}", "a")
