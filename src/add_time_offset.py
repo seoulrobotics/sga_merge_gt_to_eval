@@ -1,7 +1,15 @@
 import re
 import argparse
-import datetime
+
+from datetime import datetime
+from datetime import timedelta
+
 from csv_to_tsv import csv_to_tsv
+
+def close_files_and_exit(f_in, f_out):
+    f_in.close()
+    f_out.close()
+    exit()
 
 parser = argparse.ArgumentParser(description='Add DateTime offset to a file.')
 
@@ -22,29 +30,38 @@ filename_without_extension = args.filename.split('.')[0]
 f_in = open(f'{filename_without_extension}.tsv', "r")
 f_out = open(f'{filename_without_extension}_with_offset.tsv', "a")
 
-offset = datetime.timedelta(hours=args.hours[0], minutes=args.minutes[0], seconds=args.seconds[0])
+offset = timedelta(hours=args.hours[0], minutes=args.minutes[0], seconds=args.seconds[0])
 
 sign = -1 if args.sub else 1
 
-col_with_timestamp = 1
+# Find column containing timestamps
+f_headers = f_in.readline()
+f_out.write(f_headers)
+f_headers = re.split('\t', f_headers)
 
-for line in f_in:
+col_with_timestamp = -1
+if not f_headers[0].isdigit():
+    for idx, col in enumerate(f_headers):
+        if col.lower() == 'time':
+            col_with_timestamp = idx
+    if col_with_timestamp == -1:
+        print("Cannot parse file: 'time' header missing.")
+        close_files_and_exit(f_in, f_out)
+else:
+    print("Cannot parse file: header row missing.")
+    close_files_and_exit(f_in, f_out)
+
+# Parse timestamps
+for line in f_in.readlines():
     line = re.split('\t', line)
-    
-    if not line[0].isdigit():
-        for idx, col in enumerate(line):
-            if col.lower() == 'time':
-                col_with_timestamp = idx
-        continue
 
     if '.' in line[col_with_timestamp]:
-        time = datetime.datetime.strptime(line[col_with_timestamp],"%H%M%S.%f")
+        time = datetime.strptime(line[col_with_timestamp],"%H%M%S.%f")
     else:
-        time = datetime.datetime.strptime(line[col_with_timestamp],"%H%M%S")
+        time = datetime.strptime(line[col_with_timestamp],"%H%M%S")
     newTime = time + (offset * sign)
     line[col_with_timestamp] = newTime.strftime("%H%M%S.%f")[:10]
     line = '\t'.join(line)
     f_out.write(line)
 
-f_in.close()
-f_out.close()
+close_files_and_exit(f_in, f_out)

@@ -1,6 +1,12 @@
 import argparse
 import re
 
+from csv_to_tsv import csv_to_tsv
+
+def closeFiles(files):
+    for f in files:
+        f.close()
+
 def hasLine(lines, count):
     return count < len(lines)
 
@@ -9,25 +15,52 @@ parser = argparse.ArgumentParser(description='Script for merging .tsv files.')
 parser.add_argument('filename1')
 parser.add_argument('filename2')
 parser.add_argument('filename3')
-
+parser.add_argument('--split', action='store_true')
+    
 args = parser.parse_args()
 
-at_f = open(f'{args.filename1}', "r")
-gt_f = open(f'{args.filename2}', "r")
-ra_f = open(f'{args.filename3}', "r")
+# Convert input files from .csv -> .tsv if applicable
+files = [args.filename1, args.filename2, args.filename3]
+for i, f in enumerate(files):
+    if '.csv' in f:
+        csv_to_tsv(f)
+        files[i] = files[i].replace(".csv", ".tsv")
 
-# Skip header rows
-gt_f.readline()
-ra_f.readline()
+at_f = open(f'{files[0]}', "r")
+gt_f = open(f'{files[1]}', "r")
+ra_f = open(f'{files[2]}', "r")
 
+files = [at_f, gt_f, ra_f]
+
+# Extract header rows
+at_h = at_f.readline().upper().strip()
+at_cols = at_h.count('\t') + 1
+gt_h = gt_f.readline().upper().strip()
+gt_cols = gt_h.count('\t')
+ra_h = ra_f.readline().upper().strip()
+# ra_cols = ra_h.count('\t')
+
+# Extract data rows
 at = at_f.readlines()
 gt = gt_f.readlines()
 ra = ra_f.readlines()
 
+# EOF counters
 c_at, c_gt, c_ra = 0, 0, 0
 
-out_f = open("merged2.tsv", "a")
-out_f.write("date\ttime\tlane\tspeed\tlength\t\tdate\ttime\t\tlane\tspeed\tclass\t\ttime\tlane\tspeed\n")
+# Output file
+out_filename = "test"
+if args.split:
+    out_f1 = open(f"{out_filename}_lane1.tsv", "a")
+    out_f1.write(f"{at_h}\t\t\t{gt_h}\t\t{ra_h}\n")
+    out_f2 = open(f"{out_filename}_lane2.tsv", "a")
+    out_f2.write(f"{at_h}\t\t\t{gt_h}\t\t{ra_h}\n")
+    files.append(out_f1)
+    files.append(out_f2)
+else:
+    out_f = open(f"{out_filename}.tsv", "a")
+    out_f.write(f"{at_h}\t\t\t{gt_h}\t\t{ra_h}\n")
+    files.append(out_f)
 
 at_hasLine = hasLine(at, c_at)
 gt_hasLine = hasLine(gt, c_gt)
@@ -44,7 +77,7 @@ while (at_hasLine or gt_hasLine or ra_hasLine):
 
     if gt_hasLine:
         y_cols = re.split(r'\t+', gt[c_gt])
-        y_time = int(y_cols[1].replace(':', ''))
+        y_time = int(re.sub("[^0-9]", "", y_cols[1].replace(':', '')))
         y_lane = int(y_cols[3])
 
     if ra_hasLine:
@@ -65,7 +98,7 @@ while (at_hasLine or gt_hasLine or ra_hasLine):
         res += at[c_at].strip() + '\t\t'
         c_at += 1
     else:
-        res += '\t' * 6
+        res += (at_cols + 2) * '\t'
     
     if (gt_hasLine and
         y_time - minTime <= 1 and
@@ -73,7 +106,7 @@ while (at_hasLine or gt_hasLine or ra_hasLine):
         res += gt[c_gt].strip() + '\t\t'
         c_gt += 1
     else:
-        res += '\t' * 7
+        res += (gt_cols + 2) * '\t'
     
     if (ra_hasLine and
         z_time - minTime <= 1 and
@@ -87,9 +120,12 @@ while (at_hasLine or gt_hasLine or ra_hasLine):
     gt_hasLine = hasLine(gt, c_gt)
     ra_hasLine = hasLine(ra, c_ra)
 
-    out_f.write(res)
+    if args.split:
+        if minLane == 1:
+            out_f1.write(res)
+        elif minLane == 2:
+            out_f2.write(res)
+    else:
+        out_f.write(res)
 
-out_f.close()
-at_f.close()
-gt_f.close()
-ra_f.close()
+closeFiles(files)
