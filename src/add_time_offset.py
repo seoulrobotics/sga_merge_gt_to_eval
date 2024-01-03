@@ -23,21 +23,20 @@ parser.add_argument('--sub', action='store_true')
 
 args = parser.parse_args()
 
-if '.csv' in args.filename:
-    csv_to_tsv(args.filename)
-
-filename_without_extension = args.filename.split('.')[0]
-f_in = open(f'{filename_without_extension}.tsv', "r")
-f_out = open(f'{filename_without_extension}_with_offset.tsv', "a")
+f_in = open(f'{args.filename}', "r")
+f_out = open(f'offset_{args.filename}', "a")
 
 offset = timedelta(hours=args.hours[0], minutes=args.minutes[0], seconds=args.seconds[0])
 
 sign = -1 if args.sub else 1
 
+delimiter = ',' if '.csv' in args.filename else '\t'
+
 # Find column containing timestamps
 f_headers = f_in.readline()
 f_out.write(f_headers)
-f_headers = re.split('\t', f_headers)
+
+f_headers = re.split(delimiter, f_headers)
 
 col_with_timestamp = -1
 if not f_headers[0].isdigit():
@@ -53,7 +52,7 @@ else:
 
 # Parse timestamps
 for line in f_in.readlines():
-    line = re.split('\t', line)
+    line = re.split(delimiter, line)
 
     timestamp = line[col_with_timestamp]
     if '.' in timestamp:
@@ -62,7 +61,7 @@ for line in f_in.readlines():
     timestamp = datetime.strptime(timestamp, "%H%M%S")
     newTime = timestamp + (offset * sign)
     line[col_with_timestamp] = newTime.strftime("%H:%M:%S")
-    line = '\t'.join(line)
+    line = delimiter.join(line)
     f_out.write(line)
 
 close_files_and_exit(f_in, f_out)
