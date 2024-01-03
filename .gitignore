@@ -1,6 +1,7 @@
 __pycache__/
 
 align.py
+sort_and_format.py
 
 *.tsv
 *.csv

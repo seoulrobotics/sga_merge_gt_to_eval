@@ -55,12 +55,13 @@ else:
 for line in f_in.readlines():
     line = re.split('\t', line)
 
-    if '.' in line[col_with_timestamp]:
-        time = datetime.strptime(line[col_with_timestamp],"%H%M%S.%f")
-    else:
-        time = datetime.strptime(line[col_with_timestamp],"%H%M%S")
-    newTime = time + (offset * sign)
-    line[col_with_timestamp] = newTime.strftime("%H%M%S.%f")[:10]
+    timestamp = line[col_with_timestamp]
+    if '.' in timestamp:
+        timestamp = re.split('\.', timestamp)[0]
+    
+    timestamp = datetime.strptime(timestamp, "%H%M%S")
+    newTime = timestamp + (offset * sign)
+    line[col_with_timestamp] = newTime.strftime("%H:%M:%S")
     line = '\t'.join(line)
     f_out.write(line)
 
