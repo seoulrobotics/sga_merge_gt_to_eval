@@ -34,7 +34,7 @@ files = [at_f, gt_f, ra_f]
 
 # Extract header rows
 at_h = at_f.readline().upper().strip()
-at_cols = at_h.count('\t') + 1
+at_cols = at_h.count('\t')
 gt_h = gt_f.readline().upper().strip()
 gt_cols = gt_h.count('\t')
 ra_h = ra_f.readline().upper().strip()
@@ -49,17 +49,17 @@ ra = ra_f.readlines()
 c_at, c_gt, c_ra = 0, 0, 0
 
 # Output file
-out_filename = "test"
+out_filename = "sensys_gatso"
 if args.split:
-    out_f1 = open(f"{out_filename}_lane1.tsv", "a")
-    out_f1.write(f"{at_h}\t\t\t{gt_h}\t\t{ra_h}\n")
-    out_f2 = open(f"{out_filename}_lane2.tsv", "a")
-    out_f2.write(f"{at_h}\t\t\t{gt_h}\t\t{ra_h}\n")
+    out_f1 = open(f"{out_filename}_merged_lane1.tsv", "a")
+    out_f1.write(f"{at_h}\t\t{gt_h}\t\t{ra_h}\n")
+    out_f2 = open(f"{out_filename}_merged_lane2.tsv", "a")
+    out_f2.write(f"{at_h}\t\t{gt_h}\t\t{ra_h}\n")
     files.append(out_f1)
     files.append(out_f2)
 else:
-    out_f = open(f"{out_filename}.tsv", "a")
-    out_f.write(f"{at_h}\t\t\t{gt_h}\t\t{ra_h}\n")
+    out_f = open(f"{out_filename}_merged.tsv", "a")
+    out_f.write(f"{at_h}\t\t{gt_h}\t\t{ra_h}\n")
     files.append(out_f)
 
 at_hasLine = hasLine(at, c_at)
