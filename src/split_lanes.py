@@ -1,37 +1,32 @@
 import argparse
 
-parser = argparse.ArgumentParser(description='Script for splitting .tsv files by lane number.')
+parser = argparse.ArgumentParser(description='Splits .tsv files by lane number.')
 
 parser.add_argument('filename')
+parser.add_argument('-l', '--lanes', type=int, nargs=1, default=[2])
     
 args = parser.parse_args()
 
 # filename_without_extension = args.filename.split('.')[0]
 f_in = open(f'{args.filename}', "r")
-f_lane1 = open(f'output_files/sg_lane1.tsv', "w+")
-f_lane2 = open(f'output_files/sg_lane2.tsv', "w+")
 
-headers = f_in.readline().strip()
+files_out = [open(f'output_files/sg_lane{lane + 1}.tsv', "w+") for lane in range(args.lanes[0])]
+
+headers = f_in.readline().upper().strip()
 LANE_IDX = headers.split('\t').index('LANE')
 
-f_lane1.seek(0)
-f_lane2.seek(0)
-
-f_lane1.write(headers + '\n')
-f_lane2.write(headers + '\n')
+for f in files_out:
+    f.seek(0)
+    f.write(headers + '\n')
 
 lines = f_in.readlines()
-
 for line in lines:
-    lane = line.split('\t')[LANE_IDX]
-    if lane == '1':
-        f_lane1.write(line)
-    elif lane == '2':
-        f_lane2.write(line)
+    lane = int(line.split('\t')[LANE_IDX])
+    
+    files_out[lane - 1].write(line)
         
-f_lane1.truncate()
-f_lane2.truncate()
+for f in files_out:
+    f.truncate()
+    f.close()
 
-f_lane1.close()
-f_lane2.close()
 f_in.close()

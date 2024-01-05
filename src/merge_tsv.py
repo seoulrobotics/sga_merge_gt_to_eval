@@ -57,11 +57,13 @@ c_at, c_gt, c_ra = 0, 0, 0
 # Output file
 filename_without_extension = args.filename1.split('.')[0]
 out_f = open(f"{filename_without_extension}_merged.tsv", "a")
-out_f.write(f"{at_h}\t\t{gt_h}\t\t{ra_h}\n")
+# out_f.write(f"{at_h}\t\t{gt_h}\t\t{ra_h}\n")
+out_f.write(f"{at_h}\t\t{ra_h}\n")
 files.append(out_f)
 
 at_hasLine = hasLine(at, c_at)
-gt_hasLine = hasLine(gt, c_gt)
+# gt_hasLine = hasLine(gt, c_gt)
+gt_hasLine = False
 ra_hasLine = hasLine(ra, c_ra)
 
 while (at_hasLine or gt_hasLine or ra_hasLine):
@@ -91,7 +93,7 @@ while (at_hasLine or gt_hasLine or ra_hasLine):
     # Calculate minimum timestamp, lane number
     minTime, minLane = min(
         (x_time, x_lane),
-        (y_time, y_lane),
+        # (y_time, y_lane),
         (z_time, z_lane)
     )
     
@@ -104,26 +106,25 @@ while (at_hasLine or gt_hasLine or ra_hasLine):
     else:
         res += (len(at_cols) + 1) * '\t'
     
-    if (gt_hasLine and
-        y_time - minTime <= 1 and
-        y_lane == minLane):
-        res += gt[c_gt].strip() + '\t\t'
-        c_gt += 1
-    else:
-        res += (len(gt_cols) + 1) * '\t'
+    # if (gt_hasLine and
+    #     y_time - minTime <= 1 and
+    #     y_lane == minLane):
+    #     res += gt[c_gt].strip() + '\t\t'
+    #     c_gt += 1
+    # else:
+    #     res += (len(gt_cols) + 1) * '\t'
     
     if (ra_hasLine and
         z_time - minTime <= 1 and
         z_lane == minLane):
-        res += ra[c_ra].strip() + '\n'
+        res += ra[c_ra].strip()
         c_ra += 1
-    else:
-        res += '\n'
 
     at_hasLine = hasLine(at, c_at)
-    gt_hasLine = hasLine(gt, c_gt)
+    # gt_hasLine = hasLine(gt, c_gt)
+    gt_hasLine = False
     ra_hasLine = hasLine(ra, c_ra)
 
-    out_f.write(res)
+    out_f.write(res + '\n')
 
 closeFiles(files)

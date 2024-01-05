@@ -10,7 +10,7 @@ def close_files_and_exit(f_in, f_out):
     f_out.close()
     exit()
 
-parser = argparse.ArgumentParser(description='Add DateTime offset to a file.')
+parser = argparse.ArgumentParser(description='Add time offset to a file.')
 
 parser = argparse.ArgumentParser(add_help=False)
 
