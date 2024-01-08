@@ -7,13 +7,13 @@ def closeFiles(files):
     for f in files:
         f.close()
 
-def hasLine(lines, count):
-    return count < len(lines)
-
 def parseTimestamp(timestamp):
     if 'T' in timestamp:
         timestamp = re.split('T|\.', timestamp)[1]
     return int(timestamp.replace(':', ''))
+
+def hasLine(lines, count):
+    return count < len(lines)
 
 parser = argparse.ArgumentParser(description='Script for merging .tsv files.')
 
