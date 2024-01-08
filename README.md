@@ -8,12 +8,12 @@
     - A copy of the input file is created with modified timestamps.
     - The modified copy is split into two files, separated by lane number.
     - The resulting files are both used to merge with their corresponding gt and ra files. The merged output files are by default named `sg_lane1_merged.tsv` and `sg_lane2_merged.tsv`.
-    
+
 An example is provided in the makefile.
 
 ### Manually adding a time offset to a file:
 `python3 add_time_offset.py <filename>` can be used to arbitrarily add a datetime offset to a column, with header 'TIME', containing timestamps of the format `HHMMSS` or `HHMMSS.f`.
-- Input: any .csv or .tsv file with a column named 'time' (case insensitive) containing timestamps of the format `HHMMSS` or `HHMMSS.f`.
+- Input: any .csv or .tsv file with a column named 'time' (case insensitive) containing timestamps of the format `HHMMSS` or `HHMMSS.f` (i.e. excluding ':' or any other special characters).
 - Output: a .tsv file with modified timestamps.
 - Flags:
     - `-h <int>` to set the number of hours to modify.
