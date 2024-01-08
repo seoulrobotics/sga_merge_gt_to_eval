@@ -7,10 +7,10 @@ parser.add_argument('-l', '--lanes', type=int, nargs=1, default=[2])
     
 args = parser.parse_args()
 
-# filename_without_extension = args.filename.split('.')[0]
+filename_without_extension = args.filename.split('.')[0].replace('_offset', '')
 f_in = open(f'{args.filename}', "r")
 
-files_out = [open(f'output_files/sg_lane{lane + 1}.tsv', "w+") for lane in range(args.lanes[0])]
+files_out = [open(f'{filename_without_extension}_lane{lane + 1}.tsv', "w+") for lane in range(args.lanes[0])]
 
 headers = f_in.readline().upper().strip()
 LANE_IDX = headers.split('\t').index('LANE')
