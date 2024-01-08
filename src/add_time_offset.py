@@ -24,7 +24,7 @@ args = parser.parse_args()
 
 filename_without_extension = args.filename.split('.')[0]
 f_in = open(f'{args.filename}', "r")
-f_out = open(f'output_files/{filename_without_extension}_offset1.tsv', "a")
+f_out = open(f'output_files/{filename_without_extension}_offset.tsv', "a")
 
 offset = timedelta(hours=args.hours[0], minutes=args.minutes[0], seconds=args.seconds[0])
 
